@@ -1,0 +1,50 @@
+name: Update Version Number
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check latest commit
+        id: check_commit
+        run: |
+          LATEST_COMMIT=$(curl -s "https://api.github.com/repos/microsoft/DirectX-Headers/commits/main" | jq -r .sha)
+          echo "latest_commit=$LATEST_COMMIT" >> $GITHUB_OUTPUT
+          echo "LATEST_COMMIT=$LATEST_COMMIT" >> $GITHUB_ENV
+
+      - name: Get current version
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(grep "Version:" DirectX-Headers.spec | awk '{print $2}')
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+      - name: Update version number
+        id: update_version
+        run: |
+          BASE_VERSION=$(echo $CURRENT_VERSION | cut -d'.' -f1-3)
+          PATCH_VERSION=$(echo $CURRENT_VERSION | cut -d'.' -f4)
+          if [ -z "$PATCH_VERSION" ]; then
+            NEW_VERSION="${CURRENT_VERSION}.1"
+          else
+            NEW_VERSION="${BASE_VERSION}.$(($PATCH_VERSION + 1))"
+          fi
+          sed -i "s/Version:        ${CURRENT_VERSION}/Version:        ${NEW_VERSION}/" DirectX-Headers.spec
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "Update version to ${{ steps.update_version.outputs.new_version }}"
+          title: "Update version to ${{ steps.update_version.outputs.new_version }}"
+          body: |
+            Automated version update due to new commit in DirectX-Headers repository
+            Latest commit: ${{ steps.check_commit.outputs.latest_commit }}
+          branch: "update-version"
+          base: "main"
