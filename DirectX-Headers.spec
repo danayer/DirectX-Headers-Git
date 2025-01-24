@@ -2,10 +2,11 @@ Name:           DirectX-Headers
 Version:        1.610.0
 Release:        1%{?dist}
 Summary:        DirectX headers for using D3D12
+# LastCommit:   34c98665f205e5a9457cd6487ba0b5a10e8b634f
 
 License:        MIT
 URL:            https://github.com/microsoft/DirectX-Headers
-Source0:        %{url}/archive/refs/heads/main.tar.gz
+Source0:        %{url}/archive/%{commit}/DirectX-Headers-%{commit}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
