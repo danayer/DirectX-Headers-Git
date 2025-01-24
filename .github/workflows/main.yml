@@ -18,7 +18,7 @@ jobs:
         id: check_commit
         run: |
           LATEST_COMMIT=$(curl -s "https://api.github.com/repos/microsoft/DirectX-Headers/commits/main" | jq -r .sha)
-          CURRENT_COMMIT=$(grep "LastCommit:" DirectX-Headers.spec | awk '{print $3}')
+          CURRENT_COMMIT=$(grep "^%global commit" DirectX-Headers.spec | awk '{print $3}')
           echo "latest_commit=$LATEST_COMMIT" >> $GITHUB_OUTPUT
           if [ "$LATEST_COMMIT" != "$CURRENT_COMMIT" ]; then
             echo "needs_update=true" >> $GITHUB_OUTPUT
@@ -27,7 +27,7 @@ jobs:
       - name: Update version and commit
         if: steps.check_commit.outputs.needs_update == 'true'
         run: |
-          CURRENT_VERSION=$(grep "Version:" DirectX-Headers.spec | awk '{print $2}')
+          CURRENT_VERSION=$(grep "^Version:" DirectX-Headers.spec | awk '{print $2}')
           BASE_VERSION=$(echo $CURRENT_VERSION | cut -d'.' -f1-3)
           PATCH_VERSION=$(echo $CURRENT_VERSION | cut -d'.' -f4)
           if [ -z "$PATCH_VERSION" ]; then
@@ -35,8 +35,8 @@ jobs:
           else
             NEW_VERSION="${BASE_VERSION}.$(($PATCH_VERSION + 1))"
           fi
-          sed -i "s/Version:        ${CURRENT_VERSION}/Version:        ${NEW_VERSION}/" DirectX-Headers.spec
-          sed -i "s/LastCommit:   .*/LastCommit:   ${{ steps.check_commit.outputs.latest_commit }}/" DirectX-Headers.spec
+          sed -i "s/^Version:        ${CURRENT_VERSION}/Version:        ${NEW_VERSION}/" DirectX-Headers.spec
+          sed -i "s/^%global commit .*/%global commit ${{ steps.check_commit.outputs.latest_commit }}/" DirectX-Headers.spec
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git add DirectX-Headers.spec
