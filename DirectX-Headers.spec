@@ -70,6 +70,16 @@ done
 %meson_test
 }
 
+%files
+%doc *.md LICENSE
+%dir %_includedir/directx
+%dir %_includedir/dxguids
+%dir %_includedir/wsl
+%_includedir/directx/*
+%_includedir/dxguids/*
+%_includedir/wsl/*
+%_libdir/*.a
+%_pkgconfigdir/*.pc
 
 %files devel
 %license LICENSE
