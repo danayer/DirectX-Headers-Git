@@ -9,7 +9,7 @@
 %define _lto_cflags %{nil}
 
 Name:           DirectX-Headers
-Version:        1.615.1.1
+Version:        1.615.1.2
 Release:        1%{?dist}
 Summary:        Official Direct3D 12 headers
 
@@ -72,6 +72,7 @@ done
 
 %files
 %license LICENSE
+%doc README.md SECURITY.md
 %{_includedir}/directx
 %{_includedir}/dxguids
 %{_includedir}/wsl
