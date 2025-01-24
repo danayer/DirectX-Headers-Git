@@ -1,9 +1,9 @@
 Name:           DirectX-Headers
-Version:        1.610.0
+Version:        1.610.0.1
 Release:        1%{?dist}
 Summary:        DirectX headers for using D3D12
 
-%global commit 34c98665f205e5a9457cd6487ba0b5a10e8b634f
+%global commit 358fbfca04e8c65784397d8184f161d64bfe569e
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 License:        MIT
