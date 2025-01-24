@@ -1,12 +1,14 @@
 Name:           DirectX-Headers
-Version:        1.610.0.1
+Version:        1.610.0
 Release:        1%{?dist}
 Summary:        DirectX headers for using D3D12
-# LastCommit:   358fbfca04e8c65784397d8184f161d64bfe569e
+
+%global commit 34c98665f205e5a9457cd6487ba0b5a10e8b634f
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 License:        MIT
 URL:            https://github.com/microsoft/DirectX-Headers
-Source0:        %{url}/archive/%{commit}/DirectX-Headers-%{commit}.tar.gz
+Source0:        %{url}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -17,7 +19,7 @@ BuildRequires:  ninja-build
 DirectX headers for using D3D12
 
 %prep
-%autosetup -n %{name}-main
+%autosetup -n %{name}-%{commit}
 
 %build
 %meson \
