@@ -47,7 +47,7 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -p1
+%autosetup -n %{name}-%{commit}
 for i in LICENSE README.md ; do
   sed -i -e 's/\r$//' ${i}
   touch -r SECURITY.md ${i}
