@@ -71,15 +71,13 @@ done
 }
 
 %files
-%doc *.md LICENSE
-%dir %_includedir/directx
-%dir %_includedir/dxguids
-%dir %_includedir/wsl
-%_includedir/directx/*
-%_includedir/dxguids/*
-%_includedir/wsl/*
-%_libdir/*.a
-%_pkgconfigdir/*.pc
+%license LICENSE
+%{_includedir}/directx
+%{_includedir}/dxguids
+%{_includedir}/wsl
+%{_libdir}/pkgconfig/DirectX-Headers.pc
+%{_libdir}/libDirectX-Guids.a
+%{_libdir}/libd3dx12-format-properties.a
 
 %files devel
 %license LICENSE
