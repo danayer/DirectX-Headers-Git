@@ -8,18 +8,19 @@ Summary:        DirectX headers for using D3D12
 
 License:        MIT
 URL:            https://github.com/microsoft/DirectX-Headers
-Source0:        https://github.com/microsoft/DirectX-Headers/archive/%{commit}.tar.gz#/%{name}-%{shortcommit}.tar.gz
+Source0:        %{url}.git
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  meson
 BuildRequires:  ninja-build
+BuildRequires:  git
 
 %description
 DirectX headers for using D3D12
 
 %prep
-%autosetup -n DirectX-Headers-%{commit}
+%autosetup -S git
 
 %build
 %meson \
