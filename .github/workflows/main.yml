@@ -2,8 +2,11 @@ name: Update Version Number
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run daily at midnight
-  workflow_dispatch: # Allow manual trigger
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update-version:
@@ -15,19 +18,16 @@ jobs:
         id: check_commit
         run: |
           LATEST_COMMIT=$(curl -s "https://api.github.com/repos/microsoft/DirectX-Headers/commits/main" | jq -r .sha)
+          CURRENT_COMMIT=$(grep "LastCommit:" DirectX-Headers.spec | awk '{print $3}')
           echo "latest_commit=$LATEST_COMMIT" >> $GITHUB_OUTPUT
-          echo "LATEST_COMMIT=$LATEST_COMMIT" >> $GITHUB_ENV
+          if [ "$LATEST_COMMIT" != "$CURRENT_COMMIT" ]; then
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Get current version
-        id: get_version
+      - name: Update version and commit
+        if: steps.check_commit.outputs.needs_update == 'true'
         run: |
           CURRENT_VERSION=$(grep "Version:" DirectX-Headers.spec | awk '{print $2}')
-          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
-
-      - name: Update version number
-        id: update_version
-        run: |
           BASE_VERSION=$(echo $CURRENT_VERSION | cut -d'.' -f1-3)
           PATCH_VERSION=$(echo $CURRENT_VERSION | cut -d'.' -f4)
           if [ -z "$PATCH_VERSION" ]; then
@@ -36,15 +36,9 @@ jobs:
             NEW_VERSION="${BASE_VERSION}.$(($PATCH_VERSION + 1))"
           fi
           sed -i "s/Version:        ${CURRENT_VERSION}/Version:        ${NEW_VERSION}/" DirectX-Headers.spec
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          commit-message: "Update version to ${{ steps.update_version.outputs.new_version }}"
-          title: "Update version to ${{ steps.update_version.outputs.new_version }}"
-          body: |
-            Automated version update due to new commit in DirectX-Headers repository
-            Latest commit: ${{ steps.check_commit.outputs.latest_commit }}
-          branch: "update-version"
-          base: "main"
+          sed -i "s/LastCommit:   .*/LastCommit:   ${{ steps.check_commit.outputs.latest_commit }}/" DirectX-Headers.spec
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add DirectX-Headers.spec
+          git commit -m "Update version to ${NEW_VERSION} and commit hash"
+          git push
