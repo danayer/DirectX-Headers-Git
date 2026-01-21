@@ -9,11 +9,11 @@
 %define _lto_cflags %{nil}
 
 Name:           DirectX-Headers
-Version:        1.615.1.49
+Version:        1.615.1.50
 Release:        1%{?dist}
 Summary:        Official Direct3D 12 headers
 
-%global commit 33374754f65baac0500dda6187e371136357246f
+%global commit af8f8ff819a64be829cb713aeeb9a8278759acec
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 License:        MIT
